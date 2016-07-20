@@ -151,7 +151,7 @@ public class Config {
                 }
 
                 public List<String> getList() {
-                    return Collections.unmodifiableList(new ArrayList<>(this.list));
+                    return this.list;
                 }
             }
 
