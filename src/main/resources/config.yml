@@ -1,0 +1,18 @@
+irc:
+  server:
+    host: "irc.esper.net"
+    port: 6697
+    secure: true
+    accept-untrusted-cert: false
+  self:
+    nick: "NeverAgain"
+    user: "j2GameBot"
+    realname: "Shots 4 Shots was a horrible idea"
+  channel:
+    name: "#neveragain"
+    key: null
+  auth:
+    username: null
+    password: null
+  authorized-users:
+    - "mbaxter"
