@@ -27,6 +27,7 @@ import com.google.common.collect.ImmutableList;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -169,35 +170,60 @@ public class Config {
                 this.authorizedUsers = new AuthorizedUsers(irc.getNode("authorized-users"));
             }
 
+            @Nonnull
             public Server getServer() {
                 return this.server;
             }
 
+            @Nonnull
             public Self getSelf() {
                 return this.self;
             }
 
+            @Nonnull
             public Channel getChannel() {
                 return this.channel;
             }
 
+            @Nonnull
             public Auth getAuth() {
                 return this.auth;
             }
 
+            @Nonnull
             public AuthorizedUsers getAuthorizedUsers() {
                 return this.authorizedUsers;
             }
         }
 
+        public class Linode {
+            private final String api_key;
+
+            public Linode(ConfigurationNode linode) {
+                this.api_key = linode.getNode("api_key").getString("NeverGonnaGiveYouUp");
+            }
+
+            public String getAPIKey() {
+                return this.api_key;
+            }
+        }
+
         private final IRC irc;
+        private final Linode linode;
 
         private Data(ConfigurationNode data) {
             this.irc = new IRC(data.getNode("irc"));
+            this.linode = new Linode(data.getNode("linode"));
         }
 
+        @Nonnull
         public IRC getIRC() {
             return this.irc;
+        }
+
+        @Nonnull
+        public Linode getLinode() {
+            return this.linode;
         }
     }
 
@@ -222,6 +248,7 @@ public class Config {
         this.loadConfig();
     }
 
+    @Nonnull
     public Data getData() {
         return this.data;
     }

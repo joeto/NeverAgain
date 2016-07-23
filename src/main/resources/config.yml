@@ -16,3 +16,5 @@ irc:
     password: null
   authorized-users:
     - "mbaxter"
+linode:
+  api_key: "NeverGonnaGiveYouUp"
