@@ -23,16 +23,22 @@
  */
 package to.joe.neveragain.linode;
 
+import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import org.apache.http.client.fluent.Form;
 import org.apache.http.client.fluent.Request;
+import org.kitteh.irc.client.library.util.Pair;
 import to.joe.neveragain.linode.avail.Datacenters;
 import to.joe.neveragain.linode.avail.Plans;
+import to.joe.neveragain.linode.dns.DomainList;
+import to.joe.neveragain.linode.dns.DomainResourceList;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 public class API {
     public static class Response {
@@ -51,16 +57,18 @@ public class API {
         }
     }
 
+    private static final List<Pair<String, String>> EMPTY = ImmutableList.of();
     private static final Gson GSON = new Gson();
     public static String API_KEY;
 
     @Nonnull
-    public static <R extends Response> R get(@Nonnull Class<R> clazz, @Nonnull String action) throws IOException {
+    public static <R extends Response> R get(@Nonnull Class<R> clazz, @Nonnull String action, @Nonnull List<Pair<String, String>> parameters) throws IOException {
+        Form form = Form.form()
+                .add("api_key", API_KEY)
+                .add("api_action", action);
+        parameters.forEach(pair -> form.add(pair.getLeft(), pair.getRight()));
         String reply = Request.Post("https://api.linode.com/")
-                .bodyForm(Form.form()
-                        .add("api_key", API_KEY)
-                        .add("api_action", action)
-                        .build())
+                .bodyForm(form.build())
                 .execute()
                 .returnContent().asString(Charset.defaultCharset());
         return GSON.fromJson(reply, clazz);
@@ -68,12 +76,22 @@ public class API {
 
     @Nonnull
     public static Datacenters getAvailableDatacenters() throws IOException {
-        return API.get(Datacenters.class, "avail.datacenters");
+        return API.get(Datacenters.class, "avail.datacenters", EMPTY);
+    }
+
+    @Nonnull
+    public static DomainList getDomains() throws IOException {
+        return API.get(DomainList.class, "domain.list", EMPTY);
+    }
+
+    @Nonnull
+    public static DomainResourceList getDomainResources(int domainID) throws IOException {
+        return API.get(DomainResourceList.class, "domain.resource.list", ImmutableList.of(Pair.of("DOMAINID", String.valueOf(domainID))));
     }
 
     @Nonnull
     public static Plans getPlans() throws IOException {
-        return API.get(Plans.class, "avail.linodeplans");
+        return API.get(Plans.class, "avail.linodeplans", EMPTY);
     }
 
     @Nonnull

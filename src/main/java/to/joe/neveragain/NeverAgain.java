@@ -34,6 +34,8 @@ import org.kitteh.irc.lib.net.engio.mbassy.listener.Invoke;
 import to.joe.neveragain.linode.API;
 import to.joe.neveragain.linode.avail.Datacenters;
 import to.joe.neveragain.linode.avail.Plans;
+import to.joe.neveragain.linode.dns.DomainList;
+import to.joe.neveragain.linode.dns.DomainResourceList;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -158,33 +160,6 @@ public class NeverAgain extends Thread {
                     return;
                 }
             } catch (IOException e) {
-                event.sendReply("Error: " + e.getMessage());
-                e.printStackTrace();
-            }
-        }
-        if (event.getMessage().startsWith("!under") && event.getMessage().length() > ("!under ".length())) {
-            try {
-                String[] args = event.getMessage().split(" ");
-                if (args.length < 3) {
-                    event.sendReply("!under <hourly> <datacenter>");
-                    return;
-                }
-                Datacenters dcs = API.getAvailableDatacenters();
-                Optional<Datacenters.Datacenter> dc = dcs.getDatacenterByAbbreviation(args[2]);
-                if (dc.isPresent()) {
-                    Plans plans = API.getPlans();
-                    Optional<Plans.Plan> plan = plans.getBestPlanBelowHourlyAtDatacenter(Double.parseDouble(args[1]), dc.get().getDatacenterID());
-                    if (plan.isPresent()) {
-                        Plans.Plan p = plan.get();
-                        event.sendReply("Plan ID " + p.getPlanID() + ": " + p.getLabel() + " with " + p.getCores() + " cores at $" + p.getHourly() + " per hour");
-                    } else {
-                        event.sendReply("No plans exist at this datacenter");
-                    }
-                } else {
-                    event.sendReply("No datacenter exists with that name");
-                    return;
-                }
-            } catch (Exception e) {
                 event.sendReply("Error: " + e.getMessage());
                 e.printStackTrace();
             }
